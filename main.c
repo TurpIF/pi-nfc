@@ -358,7 +358,7 @@ int cmd_write_byte(uint8_t block_id, uint8_t position, uint8_t byte, char * keys
   PH_CHECK_SUCCESS_FCT(status, initLayers());
   PH_CHECK_SUCCESS_FCT(status, forceReadBlock(block_id, keys, nbKeys, buffer));
   buffer[position] = byte;
-  /* re = forceWriteBlock(block_id, keys, nbKeys, buffer); */
+  re = forceWriteBlock(block_id, keys, nbKeys, buffer);
 
   if (keys_file != NULL)
     free_keys(keys, nbKeys);
@@ -466,5 +466,4 @@ behind is a valid value but it's still considered as a hexadecimal value. \n\
 
   printf("%s", usage);
   return -1;
-  /* forceWriteBlock(42, keys, nbKeys, data); */
 }
