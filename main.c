@@ -84,10 +84,10 @@ phStatus_t readSector(uint8_t sector_id, uint8_t * key, uint8_t key_type, uint8_
   uint8_t block = sector_id << 2;
   PH_CHECK_SUCCESS_FCT(status,
       phhalHw_MfcAuthenticate(&hal, block, key_type, key, bUid));
-  PH_CHECK_SUCCESS_FCT(status, phalMfc_Read(&alMfc, block + 0, &data[0 * 16]));
-  PH_CHECK_SUCCESS_FCT(status, phalMfc_Read(&alMfc, block + 1, &data[1 * 16]));
-  PH_CHECK_SUCCESS_FCT(status, phalMfc_Read(&alMfc, block + 2, &data[2 * 16]));
-  PH_CHECK_SUCCESS_FCT(status, phalMfc_Read(&alMfc, block + 3, &data[3 * 16]));
+  PH_CHECK_SUCCESS_FCT(status, phalMfc_Read(&alMfc, block + 0, &data[0 * nbBlockData]));
+  PH_CHECK_SUCCESS_FCT(status, phalMfc_Read(&alMfc, block + 1, &data[1 * nbBlockData]));
+  PH_CHECK_SUCCESS_FCT(status, phalMfc_Read(&alMfc, block + 2, &data[2 * nbBlockData]));
+  PH_CHECK_SUCCESS_FCT(status, phalMfc_Read(&alMfc, block + 3, &data[3 * nbBlockData]));
   return PH_ERR_SUCCESS;
 }
 
@@ -111,8 +111,8 @@ phStatus_t forceReadSector(uint8_t sector_id, uint8_t ** keys, uint16_t nbKeys, 
 
 phStatus_t readBlock(uint8_t block_id, uint8_t * key, uint8_t key_type, uint8_t * bUid, uint8_t * data) {
   PH_CHECK_SUCCESS_FCT(status,
-      phhalHw_MfcAuthenticate(&hal, block, key_type, key, bUid));
-  PH_CHECK_SUCCESS_FCT(status, phalMfc_Read(&alMfc, block_id + 0, &data));
+      phhalHw_MfcAuthenticate(&hal, block_id, key_type, key, bUid));
+  PH_CHECK_SUCCESS_FCT(status, phalMfc_Read(&alMfc, block_id + 0, &data[0]));
   return PH_ERR_SUCCESS;
 }
 
@@ -335,12 +335,12 @@ int cmd_block(uint8_t block_id, char * keys_file) {
     return 1;
   }
 
-  /* uint8_t buffer[nbBlockData]; */
-  /* PH_CHECK_SUCCESS_FCT(status, initLayers()); */
-  /* if(forceReadBlock(sector_id, keys, nbKeys, buffer) == PH_ERR_SUCCESS) */
-  /*   print_block(buffer); */
-  /* else */
-  /*   print_empty_block(); */
+  uint8_t buffer[nbBlockData];
+  PH_CHECK_SUCCESS_FCT(status, initLayers());
+  if(forceReadBlock(block_id, keys, nbKeys, buffer) == PH_ERR_SUCCESS)
+    print_block(buffer);
+  else
+    print_empty_block();
 
   if (keys_file != NULL)
     free_keys(keys, nbKeys);
