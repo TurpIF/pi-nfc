@@ -356,10 +356,12 @@ int cmd_write_byte(uint8_t block_id, uint8_t position, uint8_t byte, char * keys
   }
 
   uint8_t buffer[nbBlockData];
+  int re = 0;
   PH_CHECK_SUCCESS_FCT(status, initLayers());
   PH_CHECK_SUCCESS_FCT(status, forceReadBlock(block_id, keys, nbKeys, buffer));
   buffer[position] = byte;
-  int re = forceWriteBlock(block_id, keys, nbKeys, buffer);
+  /* re = forceWriteBlock(block_id, keys, nbKeys, buffer); */
+
   if (keys_file != NULL)
     free_keys(keys, nbKeys);
   return re;
