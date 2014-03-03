@@ -2,6 +2,7 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 
 #include <ph_NxpBuild.h>
 #include <ph_Status.h>
@@ -124,6 +125,22 @@ phStatus_t forceWriteBlock(uint8_t block_id, uint8_t ** keys, uint16_t nbKeys, u
   return PH_ERR_AUTH_ERROR;
 }
 
+int cmd_uid() {
+  return 0;
+}
+
+int cmd_dump(char * keys_file) {
+  return 0;
+}
+
+int cmd_sector(uint8_t sector_id, char * keys_file) {
+  return 0;
+}
+
+int cmd_block(uint8_t block_id, char * keys_files) {
+  return 0;
+}
+
 int main(int argc, char ** argv)
 {
   /* Usage :
@@ -162,6 +179,40 @@ int main(int argc, char ** argv)
    * ./a.out block <sector_id> [<keys_file>]
    * Same as the "dump" command but only for the block <block_id>.
    */
+
+  if (argc == 2 && strcmp(argv[1], "uid") == 0) {
+    return cmd_uid();
+  }
+  else if ((argc == 2 || argc == 3) && strcmp(argv[1], "dump") == 0) {
+    if (argc == 3)
+      return cmd_dump(argv[2]);
+    return cmd_dump(NULL);
+  }
+  else if ((argc == 3 || argc == 4) && strcmp(argv[1], "sector") == 0) {
+    char * end;
+    long int id = strtol(argv[2], &end, 10);
+    printf("%ld", id);
+    if (!(*end == '\0' && *argv[2] != '\0')) {
+      printf("The second argument must be a number representing the sector's id\n");
+      return 1;
+    }
+    if (argc == 4)
+      return cmd_sector(id, argv[3]);
+    return cmd_sector(id, NULL);
+  }
+  else if ((argc == 3 || argc == 4) && strcmp(argv[1], "dump") == 0) {
+    char * end;
+    long int id = strtol(argv[2], &end, 10);
+    printf("%ld", id);
+    if (!(*end == '\0' && *argv[2] != '\0')) {
+      printf("The second argument must be a number representing the block's id\n");
+      return 1;
+    }
+    if (argc == 4)
+      return cmd_block(id, argv[3]);
+    return cmd_block(id, NULL);
+  }
+  return -1;
 
   PH_CHECK_SUCCESS_FCT(status, initLayers());
 
