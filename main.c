@@ -204,7 +204,6 @@ int file2keys(char * keys_file, uint8_t *** keys, uint8_t * nbKeys) {
 
   FILE * fp = fopen(keys_file, "r");
   if (fp == NULL) {
-    fclose(fp);
     free_keys(_keys, _nbKeys);
     return -1;
   }
@@ -356,8 +355,8 @@ int cmd_write_byte(uint8_t block_id, uint8_t position, uint8_t byte, char * keys
 
   uint8_t buffer[nbBlockData];
   int re = 0;
-  PH_CHECK_SUCCESS_FCT(status, initLayers());
-  PH_CHECK_SUCCESS_FCT(status, forceReadBlock(block_id, keys, nbKeys, buffer));
+  /* PH_CHECK_SUCCESS_FCT(status, initLayers()); */
+  /* PH_CHECK_SUCCESS_FCT(status, forceReadBlock(block_id, keys, nbKeys, buffer)); */
   buffer[position] = byte;
   /* re = forceWriteBlock(block_id, keys, nbKeys, buffer); */
 
