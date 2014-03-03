@@ -371,7 +371,6 @@ Same as the \"dump\" command but only for the block <block_id>.";
   else if ((argc == 3 || argc == 4) && strcmp(argv[1], "sector") == 0) {
     char * end;
     long int id = strtol(argv[2], &end, 10);
-    printf("%ld", id);
     if (!(*end == '\0' && *argv[2] != '\0')) {
       printf("The second argument must be a number representing the sector's id\n");
       return 1;
@@ -383,7 +382,6 @@ Same as the \"dump\" command but only for the block <block_id>.";
   else if ((argc == 3 || argc == 4) && strcmp(argv[1], "dump") == 0) {
     char * end;
     long int id = strtol(argv[2], &end, 10);
-    printf("%ld", id);
     if (!(*end == '\0' && *argv[2] != '\0')) {
       printf("The second argument must be a number representing the block's id\n");
       return 1;
