@@ -283,10 +283,42 @@ int cmd_dump(char * keys_file) {
 }
 
 int cmd_sector(uint8_t sector_id, char * keys_file) {
+  uint8_t ** keys;
+  uint8_t nbKeys = 0;
+  if (keys_file != NULL && file2keys(keys_file, &keys, &nbKeys) != 0) {
+    printf("Impossible to read keys from `%s`.", keys_file);
+    return 1;
+  }
+
+  uint8_t buffer[nbSectorData];
+  PH_CHECK_SUCCESS_FCT(status, initLayers());
+  if(forceReadSector(sector_id, keys, nbKeys, buffer) == PH_ERR_SUCCESS)
+    print_sector(buffer);
+  else
+    print_empty_sector();
+
+  if (keys_file != NULL)
+    free_keys(keys, nbKeys);
   return 0;
 }
 
-int cmd_block(uint8_t block_id, char * keys_files) {
+int cmd_block(uint8_t block_id, char * keys_file) {
+  uint8_t ** keys;
+  uint8_t nbKeys = 0;
+  if (keys_file != NULL && file2keys(keys_file, &keys, &nbKeys) != 0) {
+    printf("Impossible to read keys from `%s`.", keys_file);
+    return 1;
+  }
+
+  /* uint8_t buffer[nbBlockData]; */
+  /* PH_CHECK_SUCCESS_FCT(status, initLayers()); */
+  /* if(forceReadBlock(sector_id, keys, nbKeys, buffer) == PH_ERR_SUCCESS) */
+  /*   print_block(buffer); */
+  /* else */
+  /*   print_empty_block(); */
+
+  if (keys_file != NULL)
+    free_keys(keys, nbKeys);
   return 0;
 }
 
