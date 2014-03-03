@@ -126,6 +126,19 @@ phStatus_t forceWriteBlock(uint8_t block_id, uint8_t ** keys, uint16_t nbKeys, u
 }
 
 int cmd_uid() {
+  PH_CHECK_SUCCESS_FCT(status, initLayers());
+  uint8_t bSak[1];
+  uint8_t bUid[10];
+  uint8_t bNbCards;
+  uint8_t bLength;
+  uint8_t i;
+  PH_CHECK_SUCCESS_FCT(status, search_card(bUid, &bLength, bSak, &bNbCards));
+  for (i = 0; i < bLength; i++) {
+    printf("%02X", bUid[i]);
+    if (i != bLength - 1)
+      printf(" ");
+  }
+  printf("\n");
   return 0;
 }
 
