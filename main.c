@@ -347,6 +347,11 @@ int cmd_block(uint8_t block_id, char * keys_file) {
   return 0;
 }
 
+int cmd_write_byte(uint8_t block_id, uint8_t position, uint8_t byte, char * keys_file) {
+  printf("%hhd %hhd %hhX", block_id, position, byte);
+  return 0;
+}
+
 int main(int argc, char ** argv)
 {
   char * usage = "Usage : \n\
@@ -387,10 +392,11 @@ The id of the first sector is 0. And the last is the 15th sector. \n\
 Same as the \"dump\" command but only for the block <block_id>. \n\
 The id of the first block is 0. And the last is the 63rd block . \n\
 \n\
-./a.out write-byte <block_id> <byte_pos> XX [<keys_file>] \n\
-Write the byte XX at the block <block_id> at the position <byte_pos> using the \n\
+./a.out write-byte <block_id> <byte_pos> 0xXX [<keys_file>] \n\
+Write the byte 0xXX at the block <block_id> at the position <byte_pos> using the \n\
 keys inside the <keys_file> file (if given). The blocks' id and the position \n\
-begin at 0. The byte XX have to be written into hexadecimal. \n\
+begin at 0. The byte 0xXX have to be written into hexadecimal. A value without 0x \n\
+behind is a valid value but it's still considered as a hexadecimal value. \n\
 ";
 
   if (argc == 2 && strcmp(argv[1], "uid") == 0) {
@@ -422,6 +428,27 @@ begin at 0. The byte XX have to be written into hexadecimal. \n\
     if (argc == 4)
       return cmd_block(id, argv[3]);
     return cmd_block(id, NULL);
+  }
+  else if ((argc == 5 || argc == 6) && strcmp(argv[1], "write-byte") == 0) {
+    char * end;
+    long int block_id = strtol(argv[2], &end, 10);
+    if (!(*end == '\0' && *argv[2] != '\0')) {
+      printf("The second argument must be a number representing the block's id\n");
+      return 1;
+    }
+    long int position = strtol(argv[3], &end, 10);
+    if (!(*end == '\0' && *argv[3] != '\0')) {
+      printf("The third argument must be a number representing the position of the byte\n");
+      return 1;
+    }
+    uint8_t byte = strtol(argv[4], &end, 16);
+    if (!(*end == '\0' && *argv[4] != '\0')) {
+      printf("The forth argument must be a number representing the byte to write\n");
+      return 1;
+    }
+    if (argc == 6)
+      return cmd_write_byte(block_id, position, byte, argv[3]);
+    return cmd_write_byte(block_id, position, byte, NULL);
   }
 
   printf("%s", usage);
