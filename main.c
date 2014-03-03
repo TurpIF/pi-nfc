@@ -143,42 +143,41 @@ int cmd_block(uint8_t block_id, char * keys_files) {
 
 int main(int argc, char ** argv)
 {
-  /* Usage :
-   * ./a.out <cmd> [...]
-   * See the details below to know each command
-   *
-   * ./a.out uid
-   * The program check if there is a detected tag and print the uid on the
-   * standard output. The format of the uid is like XX XX XX XX where XX are
-   * hexadecimal. The number of XX block depends of the size of the tag's uid.
-   *
-   * ./a.out dump [<keys_file>]
-   * The program check if there is a detected tag and print the dump of the
-   * card on the standard output. If the <keys_file> argument is present, the
-   * program use it to decode the tag. Each line of the file have to contain
-   * one key. One key is an haxedecimal number of 12 characters. Each keys are
-   * tried one after each other on each sectors of the tag. The ouput is
-   * grouped by sector in paragraph. Each sector's block are on one line and
-   * each bytes are separated with a space. If one sector is not readable, the
-   * bytes are replaced by xx. See the exemple below :
-   *
-   * Exemple with two sectors. One full of 0xFF and one unreadable.
-   * FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
-   * FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
-   * FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
-   * FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
-   *
-   * xx xx xx xx xx xx xx xx xx xx xx xx xx xx xx xx
-   * xx xx xx xx xx xx xx xx xx xx xx xx xx xx xx xx
-   * xx xx xx xx xx xx xx xx xx xx xx xx xx xx xx xx
-   * xx xx xx xx xx xx xx xx xx xx xx xx xx xx xx xx
-   *
-   * ./a.out sector <sector_id> [<keys_file>]
-   * Same as the "dump" command but only for the sector <sector_id>.
-   *
-   * ./a.out block <sector_id> [<keys_file>]
-   * Same as the "dump" command but only for the block <block_id>.
-   */
+  char * usage = "Usage : \n\
+./a.out <cmd> [...] \n\
+See the details below to know each command \n\
+ \n\
+./a.out uid \n\
+The program check if there is a detected tag and print the uid on the \n\
+standard output. The format of the uid is like XX XX XX XX where XX are \n\
+hexadecimal. The number of XX block depends of the size of the tag's uid. \n\
+\n\
+./a.out dump [<keys_file>] \n\
+The program check if there is a detected tag and print the dump of the \n\
+card on the standard output. If the <keys_file> argument is present, the \n\
+program use it to decode the tag. Each line of the file have to contain \n\
+one key. One key is an haxedecimal number of 12 characters. Each keys are \n\
+tried one after each other on each sectors of the tag. The ouput is \n\
+grouped by sector in paragraph. Each sector's block are on one line and \n\
+each bytes are separated with a space. If one sector is not readable, the \n\
+bytes are replaced by xx. See the exemple below : \n\
+\n\
+Exemple with two sectors. One full of 0xFF and one unreadable. \n\
+FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF \n\
+FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF \n\
+FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF \n\
+FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF \n\
+\n\
+xx xx xx xx xx xx xx xx xx xx xx xx xx xx xx xx \n\
+xx xx xx xx xx xx xx xx xx xx xx xx xx xx xx xx \n\
+xx xx xx xx xx xx xx xx xx xx xx xx xx xx xx xx \n\
+xx xx xx xx xx xx xx xx xx xx xx xx xx xx xx xx \n\
+\n\
+./a.out sector <sector_id> [<keys_file>] \n\
+Same as the \"dump\" command but only for the sector <sector_id>. \n\
+\n\
+./a.out block <sector_id> [<keys_file>] \n\
+Same as the \"dump\" command but only for the block <block_id>.";
 
   if (argc == 2 && strcmp(argv[1], "uid") == 0) {
     return cmd_uid();
@@ -212,6 +211,8 @@ int main(int argc, char ** argv)
       return cmd_block(id, argv[3]);
     return cmd_block(id, NULL);
   }
+
+  printf("%s", usage);
   return -1;
 
   PH_CHECK_SUCCESS_FCT(status, initLayers());
