@@ -382,7 +382,7 @@ xx xx xx xx xx xx xx xx xx xx xx xx xx xx xx xx \n\
 ./a.out sector <sector_id> [<keys_file>] \n\
 Same as the \"dump\" command but only for the sector <sector_id>. \n\
 \n\
-./a.out block <sector_id> [<keys_file>] \n\
+./a.out block <block_id> [<keys_file>] \n\
 Same as the \"dump\" command but only for the block <block_id>.";
 
   if (argc == 2 && strcmp(argv[1], "uid") == 0) {
@@ -404,7 +404,7 @@ Same as the \"dump\" command but only for the block <block_id>.";
       return cmd_sector(id, argv[3]);
     return cmd_sector(id, NULL);
   }
-  else if ((argc == 3 || argc == 4) && strcmp(argv[1], "dump") == 0) {
+  else if ((argc == 3 || argc == 4) && strcmp(argv[1], "block") == 0) {
     char * end;
     long int id = strtol(argv[2], &end, 10);
     if (!(*end == '\0' && *argv[2] != '\0')) {
