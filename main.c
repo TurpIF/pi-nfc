@@ -355,8 +355,8 @@ int cmd_write_byte(uint8_t block_id, uint8_t position, uint8_t byte, char * keys
 
   uint8_t buffer[nbBlockData];
   int re = 0;
-  /* PH_CHECK_SUCCESS_FCT(status, initLayers()); */
-  /* PH_CHECK_SUCCESS_FCT(status, forceReadBlock(block_id, keys, nbKeys, buffer)); */
+  PH_CHECK_SUCCESS_FCT(status, initLayers());
+  PH_CHECK_SUCCESS_FCT(status, forceReadBlock(block_id, keys, nbKeys, buffer));
   buffer[position] = byte;
   /* re = forceWriteBlock(block_id, keys, nbKeys, buffer); */
 
@@ -460,7 +460,7 @@ behind is a valid value but it's still considered as a hexadecimal value. \n\
       return 1;
     }
     if (argc == 6)
-      return cmd_write_byte(block_id, position, byte, argv[3]);
+      return cmd_write_byte(block_id, position, byte, argv[5]);
     return cmd_write_byte(block_id, position, byte, NULL);
   }
 
