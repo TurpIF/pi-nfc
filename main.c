@@ -109,6 +109,31 @@ phStatus_t forceReadSector(uint8_t sector_id, uint8_t ** keys, uint16_t nbKeys, 
   return PH_ERR_AUTH_ERROR;
 }
 
+phStatus_t readBlock(uint8_t block_id, uint8_t * key, uint8_t key_type, uint8_t * bUid, uint8_t * data) {
+  PH_CHECK_SUCCESS_FCT(status,
+      phhalHw_MfcAuthenticate(&hal, block, key_type, key, bUid));
+  PH_CHECK_SUCCESS_FCT(status, phalMfc_Read(&alMfc, block_id + 0, &data));
+  return PH_ERR_SUCCESS;
+}
+
+phStatus_t forceReadBlock(uint8_t block_id, uint8_t ** keys, uint16_t nbKeys, uint8_t * data) {
+  uint8_t bSak[1];
+  uint8_t bUid[10];
+  uint8_t bNbCards;
+  uint8_t bLength;
+  uint16_t i;
+  PH_CHECK_SUCCESS_FCT(status, search_card(bUid, &bLength, bSak, &bNbCards));
+  for (i = 0; i < nbKeys; i++) {
+    if (readBlock(block_id, keys[i], PHAL_MFC_KEYA, bUid, data) == PH_ERR_SUCCESS)
+      return PH_ERR_SUCCESS;
+    PH_CHECK_SUCCESS_FCT(status, search_card(bUid, &bLength, bSak, &bNbCards));
+    if (readBlock(block_id, keys[i], PHAL_MFC_KEYB, bUid, data) == PH_ERR_SUCCESS)
+      return PH_ERR_SUCCESS;
+    PH_CHECK_SUCCESS_FCT(status, search_card(bUid, &bLength, bSak, &bNbCards));
+  }
+  return PH_ERR_AUTH_ERROR;
+}
+
 phStatus_t writeBlock(uint8_t block, uint8_t * key, uint8_t key_type, uint8_t * bUid, uint8_t * data) {
   PH_CHECK_SUCCESS_FCT(status,
       phhalHw_MfcAuthenticate(&hal, block, key_type, key, bUid));
