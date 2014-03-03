@@ -162,7 +162,6 @@ phStatus_t forceWriteBlock(uint8_t block_id, uint8_t ** keys, uint16_t nbKeys, u
 ssize_t fgetlinesnumber(char * file) {
   FILE * fp = fopen(file, "r");
   if (fp == NULL) {
-    fclose(fp);
     return -1;
   }
 
