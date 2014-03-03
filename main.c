@@ -221,26 +221,34 @@ int cmd_dump(char * keys_file) {
     return 1;
   }
 
+  static const uint8_t nbSector = 16;
+  static const uint8_t nbBlockBySector = 4;
+  static const uint8_t nbData = 64;
   uint8_t sector;
-  uint8_t buffer[64];
+  uint8_t buffer[nbData];
   uint8_t i;
   PH_CHECK_SUCCESS_FCT(status, initLayers());
-  for (sector = 0; sector < 16; sector++) {
+  for (sector = 0; sector < nbSector; sector++) {
     if(forceReadSector(sector, keys, nbKeys, buffer) == PH_ERR_SUCCESS) {
-      for (i = 0; i < 64; i++) {
-        printf("%02X ", buffer[i]);
-        if ((i + 1) % 16 == 0)
+      for (i = 0; i < nbData; i++) {
+        printf("%02X", buffer[i]);
+        if (i != nbData - 1)
+          printf(" ");
+        if ((i + 1) % (nbData / nbBlockBySector) == 0)
           printf("\n");
       }
     }
     else {
-      for (i = 0; i < 64; i++) {
-        printf("xx ");
-        if ((i + 1) % 16 == 0)
+      for (i = 0; i < nbData; i++) {
+        printf("xx");
+        if (i != nbData - 1)
+          printf(" ");
+        if ((i + 1) % (nbData / nbBlockBySector) == 0)
           printf("\n");
       }
     }
-    printf("\n");
+    if (sector != nbSector - 1)
+      printf("\n");
   }
 
   if (keys_file != NULL)
