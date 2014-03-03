@@ -125,13 +125,84 @@ phStatus_t forceWriteBlock(uint8_t block_id, uint8_t ** keys, uint16_t nbKeys, u
   return PH_ERR_AUTH_ERROR;
 }
 
+ssize_t fgetlinesnumber(char * file) {
+  FILE * fp = fopen(file, "r");
+  if (fp == NULL) {
+    fclose(fp);
+    return -1;
+  }
+
+  ssize_t count = 0;
+  int c;
+  while ((c = fgetc(fp)) != EOF) {
+    if (c == '\n')
+      count++;
+  }
+  fclose(fp);
+  return count;
+}
+
+void free_keys(uint8_t ** keys, uint8_t nbKeys) {
+  uint8_t i;
+  for(i = 0; i < nbKeys; i++)
+    free(keys[i]);
+  free(keys);
+}
+
+int file2keys(char * keys_file, uint8_t *** keys, uint8_t * nbKeys) {
+  uint8_t _nbKeys = fgetlinesnumber(keys_file);
+  if (_nbKeys <= 0)
+    return -1;
+
+  uint8_t ** _keys = calloc(_nbKeys, sizeof(uint8_t *));
+  if (_keys == NULL) {
+    return -1;
+  }
+  uint8_t i, j;
+  for (i = 0; i < _nbKeys; i++) {
+    _keys[i] = calloc(6, sizeof(uint8_t));
+    if (_keys[i] == NULL) {
+      for(j = 0; j <= i; j++)
+        free(_keys[j]);
+      free(_keys);
+      return -1;
+    }
+  }
+
+  FILE * fp = fopen(keys_file, "r");
+  if (fp == NULL) {
+    fclose(fp);
+    free_keys(_keys, _nbKeys);
+    return -1;
+  }
+
+  for(i = 0; i < _nbKeys; i++) {
+    if (fscanf(fp, "%02hhX %02hhX %02hhX %02hhX %02hhX %02hhX",
+        &_keys[i][0],
+        &_keys[i][1],
+        &_keys[i][2],
+        &_keys[i][3],
+        &_keys[i][4],
+        &_keys[i][5]) != 6) {
+      free_keys(_keys, _nbKeys);
+      return -1;
+    }
+  }
+
+  *keys = _keys;
+  *nbKeys = _nbKeys;
+
+  fclose(fp);
+  return 0;
+}
+
 int cmd_uid() {
-  PH_CHECK_SUCCESS_FCT(status, initLayers());
   uint8_t bSak[1];
   uint8_t bUid[10];
   uint8_t bNbCards;
   uint8_t bLength;
   uint8_t i;
+  PH_CHECK_SUCCESS_FCT(status, initLayers());
   PH_CHECK_SUCCESS_FCT(status, search_card(bUid, &bLength, bSak, &bNbCards));
   for (i = 0; i < bLength; i++) {
     printf("%02X", bUid[i]);
@@ -143,6 +214,37 @@ int cmd_uid() {
 }
 
 int cmd_dump(char * keys_file) {
+  uint8_t ** keys;
+  uint8_t nbKeys = 0;
+  if (keys_file != NULL && file2keys(keys_file, &keys, &nbKeys) != 0) {
+    printf("Impossible to read keys from `%s`.", keys_file);
+    return 1;
+  }
+
+  uint8_t sector;
+  uint8_t buffer[64];
+  uint8_t i;
+  PH_CHECK_SUCCESS_FCT(status, initLayers());
+  for (sector = 0; sector < 16; sector++) {
+    if(forceReadSector(sector, keys, nbKeys, buffer) == PH_ERR_SUCCESS) {
+      for (i = 0; i < 64; i++) {
+        printf("%02X ", buffer[i]);
+        if ((i + 1) % 16 == 0)
+          printf("\n");
+      }
+    }
+    else {
+      for (i = 0; i < 64; i++) {
+        printf("xx ");
+        if ((i + 1) % 16 == 0)
+          printf("\n");
+      }
+    }
+    printf("\n");
+  }
+
+  if (keys_file != NULL)
+    free_keys(keys, nbKeys);
   return 0;
 }
 
