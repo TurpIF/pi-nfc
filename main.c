@@ -124,12 +124,44 @@ phStatus_t forceWriteBlock(uint8_t block_id, uint8_t ** keys, uint16_t nbKeys, u
   return PH_ERR_AUTH_ERROR;
 }
 
-int main(void)
+int main(int argc, char ** argv)
 {
-  static uint8_t bSak[1];
-  static uint8_t bUid[10];
-  static uint8_t bMoreCardsAvailable;
-  static uint8_t bLength;
+  /* Usage :
+   * ./a.out <cmd> [...]
+   * See the details below to know each command
+   *
+   * ./a.out uid
+   * The program check if there is a detected tag and print the uid on the
+   * standard output. The format of the uid is like XX XX XX XX where XX are
+   * hexadecimal. The number of XX block depends of the size of the tag's uid.
+   *
+   * ./a.out dump [<keys_file>]
+   * The program check if there is a detected tag and print the dump of the
+   * card on the standard output. If the <keys_file> argument is present, the
+   * program use it to decode the tag. Each line of the file have to contain
+   * one key. One key is an haxedecimal number of 12 characters. Each keys are
+   * tried one after each other on each sectors of the tag. The ouput is
+   * grouped by sector in paragraph. Each sector's block are on one line and
+   * each bytes are separated with a space. If one sector is not readable, the
+   * bytes are replaced by xx. See the exemple below :
+   *
+   * Exemple with two sectors. One full of 0xFF and one unreadable.
+   * FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+   * FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+   * FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+   * FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+   *
+   * xx xx xx xx xx xx xx xx xx xx xx xx xx xx xx xx
+   * xx xx xx xx xx xx xx xx xx xx xx xx xx xx xx xx
+   * xx xx xx xx xx xx xx xx xx xx xx xx xx xx xx xx
+   * xx xx xx xx xx xx xx xx xx xx xx xx xx xx xx xx
+   *
+   * ./a.out sector <sector_id> [<keys_file>]
+   * Same as the "dump" command but only for the sector <sector_id>.
+   *
+   * ./a.out block <sector_id> [<keys_file>]
+   * Same as the "dump" command but only for the block <block_id>.
+   */
 
   PH_CHECK_SUCCESS_FCT(status, initLayers());
 
@@ -143,7 +175,7 @@ int main(void)
   static const uint16_t nbKeys = 7;
   uint8_t * keys[7] = {key1, key2, key3, key4, key5, key6, key7};
 
-  uint8_t data[16] = {0};
+  /* uint8_t data[16] = {0}; */
   /* data[0] = 0x42; */
   /* data[1] = 0x13; */
   /* data[2] = 0x37; */
