@@ -418,49 +418,5 @@ Same as the \"dump\" command but only for the block <block_id>.";
 
   printf("%s", usage);
   return -1;
-
-  PH_CHECK_SUCCESS_FCT(status, initLayers());
-
-  uint8_t key1[6] = {0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5};
-  uint8_t key2[6] = {0xb4, 0xce, 0x31, 0x75, 0x17, 0xda};
-  uint8_t key3[6] = {0xfe, 0xa7, 0xe1, 0x1b, 0x47, 0xb3};
-  uint8_t key4[6] = {0x58, 0x23, 0xc4, 0xec, 0xfa, 0x01};
-  uint8_t key5[6] = {0x8f, 0xef, 0x64, 0x3e, 0x56, 0x04};
-  uint8_t key6[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
-  uint8_t key7[6] = {0x04, 0x91, 0xa7, 0x84, 0x17, 0x1a};
-  static const uint16_t nbKeys = 7;
-  uint8_t * keys[7] = {key1, key2, key3, key4, key5, key6, key7};
-
-  /* uint8_t data[16] = {0}; */
-  /* data[0] = 0x42; */
-  /* data[1] = 0x13; */
-  /* data[2] = 0x37; */
-  /* data[3] = 0x03; */
-  /* data[4] = 0x14; */
-  /* data[5] = 0x15; */
   /* forceWriteBlock(42, keys, nbKeys, data); */
-
-  uint8_t sector = 43;
-  uint8_t buffer[64];
-  uint8_t i;
-  for (sector = 0; sector < 16; sector++) {
-    /* printf("Sector %02d:\n", sector); */
-    if(forceReadSector(sector, keys, nbKeys, buffer) == PH_ERR_SUCCESS) {
-      for (i = 0; i < 64; i++) {
-        printf("%02X ", buffer[i]);
-        if ((i + 1) % 16 == 0)
-          printf("\n");
-      }
-    }
-    else {
-      for (i = 0; i < 64; i++) {
-        printf("xx ");
-        if ((i + 1) % 16 == 0)
-          printf("\n");
-      }
-    }
-    printf("\n");
-  }
-
-  return 0;
 }
