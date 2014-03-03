@@ -11,11 +11,19 @@
 #include <phpalI14443p4.h>
 #include <phalMfc.h>
 
+static const uint8_t nbSector = 16;
+static const uint8_t nbBlockData = 16;
+static const uint8_t nbSectorData = 64;
+
 static phStatus_t initLayers();
+static phStatus_t search_card(uint8_t * pUid, uint8_t * pLength, uint8_t * pSak, uint8_t * pNbCards);
+static phStatus_t readSector(uint8_t sector_id, uint8_t * key, uint8_t key_type, uint8_t * bUid, uint8_t * data);
+static phStatus_t forceReadSector(uint8_t sector_id, uint8_t ** keys, uint16_t nbKeys, uint8_t * data);
+static phStatus_t writeBlock(uint8_t block, uint8_t * key, uint8_t key_type, uint8_t * bUid, uint8_t * data);
+static phStatus_t forceWriteBlock(uint8_t block_id, uint8_t ** keys, uint16_t nbKeys, uint8_t * data);
 
 static phStatus_t status;
 static uint8_t bHalBufferReader[0x40];
-
 static phbalReg_R_Pi_spi_DataParams_t bal;
 static phhalHw_Rc523_DataParams_t hal;
 static phpalI14443p3a_Sw_DataParams_t palI14443p3a;
@@ -71,6 +79,7 @@ phStatus_t search_card(uint8_t * pUid, uint8_t * pLength, uint8_t * pSak, uint8_
 
   return PH_ERR_SUCCESS;
 }
+
 phStatus_t readSector(uint8_t sector_id, uint8_t * key, uint8_t key_type, uint8_t * bUid, uint8_t * data) {
   uint8_t block = sector_id << 2;
   PH_CHECK_SUCCESS_FCT(status,
@@ -196,6 +205,9 @@ int file2keys(char * keys_file, uint8_t *** keys, uint8_t * nbKeys) {
   return 0;
 }
 
+void print_block(uint8_t * data) {
+}
+
 int cmd_uid() {
   uint8_t bSak[1];
   uint8_t bUid[10];
@@ -221,29 +233,26 @@ int cmd_dump(char * keys_file) {
     return 1;
   }
 
-  static const uint8_t nbSector = 16;
-  static const uint8_t nbBlockBySector = 4;
-  static const uint8_t nbData = 64;
   uint8_t sector;
-  uint8_t buffer[nbData];
+  uint8_t buffer[nbSectorData];
   uint8_t i;
   PH_CHECK_SUCCESS_FCT(status, initLayers());
   for (sector = 0; sector < nbSector; sector++) {
     if(forceReadSector(sector, keys, nbKeys, buffer) == PH_ERR_SUCCESS) {
-      for (i = 0; i < nbData; i++) {
+      for (i = 0; i < nbSectorData; i++) {
         printf("%02X", buffer[i]);
-        if (i != nbData - 1)
+        if (i != nbSectorData - 1)
           printf(" ");
-        if ((i + 1) % (nbData / nbBlockBySector) == 0)
+        if ((i + 1) % nbBlockData == 0)
           printf("\n");
       }
     }
     else {
-      for (i = 0; i < nbData; i++) {
+      for (i = 0; i < nbSectorData; i++) {
         printf("xx");
-        if (i != nbData - 1)
+        if (i != nbSectorData - 1)
           printf(" ");
-        if ((i + 1) % (nbData / nbBlockBySector) == 0)
+        if ((i + 1) % nbBlockData == 0)
           printf("\n");
       }
     }
