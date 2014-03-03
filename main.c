@@ -348,8 +348,21 @@ int cmd_block(uint8_t block_id, char * keys_file) {
 }
 
 int cmd_write_byte(uint8_t block_id, uint8_t position, uint8_t byte, char * keys_file) {
-  printf("%hhd %hhd %hhX", block_id, position, byte);
-  return 0;
+  uint8_t ** keys;
+  uint8_t nbKeys = 0;
+  if (keys_file != NULL && file2keys(keys_file, &keys, &nbKeys) != 0) {
+    printf("Impossible to read keys from `%s`.", keys_file);
+    return 1;
+  }
+
+  uint8_t buffer[nbBlockData];
+  PH_CHECK_SUCCESS_FCT(status, initLayers());
+  PH_CHECK_SUCCESS_FCT(status, forceReadBlock(block_id, keys, nbKeys, buffer));
+  buffer[position] = byte;
+  int re = forceWriteBlock(block_id, keys, nbKeys, buffer);
+  if (keys_file != NULL)
+    free_keys(keys, nbKeys);
+  return re;
 }
 
 int main(int argc, char ** argv)
