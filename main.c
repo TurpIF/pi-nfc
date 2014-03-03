@@ -206,6 +206,37 @@ int file2keys(char * keys_file, uint8_t *** keys, uint8_t * nbKeys) {
 }
 
 void print_block(uint8_t * data) {
+  int i;
+  for (i = 0; i < nbBlockData; i++) {
+    printf("%02X", data[i]);
+    if (i != nbBlockData - 1)
+      printf(" ");
+  }
+  printf("\n");
+}
+
+void print_empty_block() {
+  int i;
+  for (i = 0; i < nbBlockData; i++) {
+    printf("xx");
+    if (i != nbBlockData - 1)
+      printf(" ");
+  }
+  printf("\n");
+}
+
+void print_sector(uint8_t * data) {
+  print_block(&data[0 * nbBlockData]);
+  print_block(&data[1 * nbBlockData]);
+  print_block(&data[2 * nbBlockData]);
+  print_block(&data[3 * nbBlockData]);
+}
+
+void print_empty_sector() {
+  print_empty_block();
+  print_empty_block();
+  print_empty_block();
+  print_empty_block();
 }
 
 int cmd_uid() {
@@ -238,24 +269,10 @@ int cmd_dump(char * keys_file) {
   uint8_t i;
   PH_CHECK_SUCCESS_FCT(status, initLayers());
   for (sector = 0; sector < nbSector; sector++) {
-    if(forceReadSector(sector, keys, nbKeys, buffer) == PH_ERR_SUCCESS) {
-      for (i = 0; i < nbSectorData; i++) {
-        printf("%02X", buffer[i]);
-        if (i != nbSectorData - 1)
-          printf(" ");
-        if ((i + 1) % nbBlockData == 0)
-          printf("\n");
-      }
-    }
-    else {
-      for (i = 0; i < nbSectorData; i++) {
-        printf("xx");
-        if (i != nbSectorData - 1)
-          printf(" ");
-        if ((i + 1) % nbBlockData == 0)
-          printf("\n");
-      }
-    }
+    if(forceReadSector(sector, keys, nbKeys, buffer) == PH_ERR_SUCCESS)
+      print_sector(buffer);
+    else
+      print_empty_sector();
     if (sector != nbSector - 1)
       printf("\n");
   }
