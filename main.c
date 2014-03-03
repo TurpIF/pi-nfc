@@ -381,9 +381,17 @@ xx xx xx xx xx xx xx xx xx xx xx xx xx xx xx xx \n\
 \n\
 ./a.out sector <sector_id> [<keys_file>] \n\
 Same as the \"dump\" command but only for the sector <sector_id>. \n\
+The id of the first sector is 0. And the last is the 15th sector. \n\
 \n\
 ./a.out block <block_id> [<keys_file>] \n\
-Same as the \"dump\" command but only for the block <block_id>.";
+Same as the \"dump\" command but only for the block <block_id>. \n\
+The id of the first block is 0. And the last is the 63rd block . \n\
+\n\
+./a.out write-byte <block_id> <byte_pos> XX [<keys_file>] \n\
+Write the byte XX at the block <block_id> at the position <byte_pos> using the \n\
+keys inside the <keys_file> file (if given). The blocks' id and the position \n\
+begin at 0. The byte XX have to be written into hexadecimal. \n\
+";
 
   if (argc == 2 && strcmp(argv[1], "uid") == 0) {
     return cmd_uid();
